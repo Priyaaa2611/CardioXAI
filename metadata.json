@@ -1,0 +1,7 @@
+{
+  "name": "CardioXAI - Cardiac Prediction System",
+  "description": "An advanced cardiac disease prediction platform using integrated ECG and TMT data with Explainable AI (XAI) for transparent medical analysis and reporting.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
