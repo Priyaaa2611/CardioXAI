@@ -404,37 +404,71 @@ const Home: React.FC = () => {
                             </button>
                         </div>
 
-                        <div id="report-content" className="space-y-8 bg-slate-950 p-4 md:p-8 rounded-[2rem]">
+                        <div id="report-content" className="space-y-8 bg-slate-950 p-4 md:p-8 rounded-[2rem] border border-white/5 relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-red-500/5 blur-[100px] -z-10" />
+
+                            {/* Analysis Summary Header */}
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div className="glass-card p-6 rounded-3xl flex flex-col justify-center border-l-4 border-l-red-500">
+                                    <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Risk Score</span>
+                                    <span className="text-3xl font-black text-white">{report.riskScore}%</span>
+                                </div>
+                                <div className="glass-card p-6 rounded-3xl flex flex-col justify-center border-l-4 border-l-indigo-500">
+                                    <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Patient</span>
+                                    <span className="text-lg font-bold text-white truncate">{report.name}</span>
+                                </div>
+                                <div className="glass-card p-6 rounded-3xl flex flex-col justify-center border-l-4 border-l-emerald-500">
+                                    <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Status</span>
+                                    <span className={`text-sm font-black uppercase ${report.riskScore > 70 ? 'text-red-400' : report.riskScore > 40 ? 'text-amber-400' : 'text-emerald-400'}`}>
+                                        {report.riskScore > 70 ? 'CRITICAL' : report.riskScore > 40 ? 'MODERATE' : 'STABLE'}
+                                    </span>
+                                </div>
+                                <div className="glass-card p-6 rounded-3xl flex flex-col justify-center border-l-4 border-l-slate-500">
+                                    <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Generated</span>
+                                    <span className="text-sm font-bold text-slate-400">{report.date.split(',')[0]}</span>
+                                </div>
+                            </div>
+
                             {/* Visual Analysis Section */}
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                                <div className="glass-card p-8 rounded-3xl flex flex-col items-center justify-center text-center">
-                                    <h3 className="text-slate-500 font-bold uppercase tracking-widest text-xs mb-4">Risk Severity</h3>
-                                    <Heart3D intensity={report.riskScore / 100} />
-                                    <div className="mt-4">
-                                        <span className={`px-4 py-1 rounded-full text-sm font-bold ${report.riskScore > 70 ? 'bg-red-500/20 text-red-500' :
+                                <div className="glass-card p-8 rounded-3xl flex flex-col items-center justify-center text-center relative overflow-hidden group">
+                                    <div className="absolute inset-0 bg-gradient-to-b from-red-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    <h3 className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mb-8 relative z-10">Neural Risk Visualization</h3>
+                                    <div className="relative z-10 scale-110">
+                                        <Heart3D intensity={report.riskScore / 100} />
+                                    </div>
+                                    <div className="mt-8 relative z-10">
+                                        <span className={`px-6 py-2 rounded-full text-xs font-black tracking-tighter ${report.riskScore > 70 ? 'bg-red-500/20 text-red-500' :
                                             report.riskScore > 40 ? 'bg-amber-500/20 text-amber-500' :
                                                 'bg-emerald-500/20 text-emerald-500'
                                             }`}>
-                                            {report.riskScore > 70 ? 'CRITICAL RISK' : report.riskScore > 40 ? 'MODERATE RISK' : 'LOW RISK'}
+                                            {report.riskScore > 70 ? 'HIGH PRIORITY CASE' : report.riskScore > 40 ? 'FOLLOW-UP RECOMMENDED' : 'ROUTINE MONITORING'}
                                         </span>
                                     </div>
                                 </div>
 
                                 <div className="md:col-span-2 glass-card p-8 rounded-3xl">
-                                    <h3 className="text-slate-500 font-bold uppercase tracking-widest text-xs mb-6">Explainable AI: Feature Impact Analysis</h3>
+                                    <div className="flex items-center justify-between mb-8">
+                                        <h3 className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Explainable AI: Multi-Modal Feature Impact</h3>
+                                        <div className="flex gap-2">
+                                            <div className="w-2 h-2 rounded-full bg-red-500" />
+                                            <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                                        </div>
+                                    </div>
                                     <div className="h-[250px] w-full">
                                         <ResponsiveContainer width="100%" height="100%">
-                                            <BarChart data={report.featureImportance} layout="vertical">
-                                                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
+                                            <BarChart data={report.featureImportance} layout="vertical" margin={{ left: 20 }}>
+                                                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" horizontal={false} />
                                                 <XAxis type="number" hide />
-                                                <YAxis dataKey="feature" type="category" stroke="#94a3b8" width={120} fontSize={12} />
+                                                <YAxis dataKey="feature" type="category" stroke="#64748b" width={100} fontSize={10} fontWeight="bold" />
                                                 <Tooltip
-                                                    contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #ffffff20', borderRadius: '12px' }}
-                                                    itemStyle={{ color: '#ef4444' }}
+                                                    cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+                                                    contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: '16px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.5)' }}
+                                                    itemStyle={{ color: '#ef4444', fontWeight: 'bold' }}
                                                 />
-                                                <Bar dataKey="impact" radius={[0, 4, 4, 0]}>
+                                                <Bar dataKey="impact" radius={[0, 8, 8, 0]} barSize={20}>
                                                     {report.featureImportance.map((entry, index) => (
-                                                        <Cell key={`cell-${index}`} fill={entry.impact > 7 ? '#ef4444' : '#10b981'} />
+                                                        <Cell key={`cell-${index}`} fill={entry.impact > 7 ? '#ef4444' : '#10b981'} fillOpacity={0.8} />
                                                     ))}
                                                 </Bar>
                                             </BarChart>
@@ -445,19 +479,21 @@ const Home: React.FC = () => {
 
                             {/* Explanation Section */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div className="glass-card p-8 rounded-3xl">
-                                    <div className="flex items-center gap-3 mb-4">
-                                        <Stethoscope className="text-red-500" />
-                                        <h3 className="text-xl font-bold">Clinical Interpretation</h3>
+                                <div className="glass-card p-8 rounded-3xl relative">
+                                    <div className="flex items-center gap-3 mb-6">
+                                        <div className="p-2 rounded-lg bg-red-500/10">
+                                            <Stethoscope className="text-red-500" size={20} />
+                                        </div>
+                                        <h3 className="text-xl font-black tracking-tight">Clinical Interpretation</h3>
                                     </div>
-                                    <p className="text-slate-400 leading-relaxed text-sm">
-                                        {report.explanation}
+                                    <p className="text-slate-400 leading-relaxed text-sm bg-white/5 p-4 rounded-2xl border border-white/5 italic">
+                                        "{report.explanation}"
                                     </p>
-                                    <div className="mt-6">
-                                        <h4 className="text-xs font-bold uppercase text-slate-500 mb-3">Potential Conditions Detected</h4>
+                                    <div className="mt-8">
+                                        <h4 className="text-[10px] font-black uppercase text-slate-500 mb-4 tracking-[0.2em]">Differential Diagnosis</h4>
                                         <div className="flex flex-wrap gap-2">
                                             {report.potentialConditions.map((c, i) => (
-                                                <span key={i} className="bg-red-500/10 border border-red-500/20 text-red-400 px-3 py-1 rounded-lg text-xs font-bold">
+                                                <span key={i} className="bg-slate-900 border border-white/10 text-slate-300 px-4 py-1.5 rounded-xl text-[11px] font-bold hover:border-red-500/50 transition-colors">
                                                     {c}
                                                 </span>
                                             ))}
@@ -466,54 +502,64 @@ const Home: React.FC = () => {
                                 </div>
 
                                 <div className="glass-card p-8 rounded-3xl">
-                                    <div className="flex items-center gap-3 mb-6">
-                                        <Leaf className="text-emerald-500" />
-                                        <h3 className="text-xl font-bold">Natural Home Remedies</h3>
-                                    </div>
-                                    <div className="space-y-6">
-                                        <div>
-                                            <h4 className="text-xs font-bold uppercase text-emerald-500 mb-2">Dietary Modifications</h4>
-                                            <ul className="grid grid-cols-1 gap-1">
-                                                {report.recommendations.diet.map((item, i) => (
-                                                    <li key={i} className="text-sm text-slate-400 flex items-start gap-2">
-                                                        <span className="text-emerald-500 mt-1">•</span> {item}
-                                                    </li>
-                                                ))}
-                                            </ul>
+                                    <div className="flex items-center gap-3 mb-8">
+                                        <div className="p-2 rounded-lg bg-emerald-500/10">
+                                            <Leaf className="text-emerald-500" size={20} />
                                         </div>
-                                        <div>
-                                            <h4 className="text-xs font-bold uppercase text-amber-500 mb-2">Herbal Supports</h4>
-                                            <ul className="grid grid-cols-1 gap-1">
-                                                {report.recommendations.herbs.map((item, i) => (
-                                                    <li key={i} className="text-sm text-slate-400 flex items-start gap-2">
-                                                        <span className="text-amber-500 mt-1">•</span> {item}
-                                                    </li>
+                                        <h3 className="text-xl font-black tracking-tight">Therapeutic Guidance</h3>
+                                    </div>
+                                    <div className="grid grid-cols-1 gap-6">
+                                        <div className="space-y-4">
+                                            <h4 className="text-[10px] font-black uppercase text-emerald-500 tracking-[0.2em]">Clinical Nutrition</h4>
+                                            <div className="flex flex-wrap gap-2">
+                                                {report.recommendations.diet.map((item, i) => (
+                                                    <div key={i} className="text-[11px] font-bold text-slate-400 bg-emerald-500/5 border border-emerald-500/10 px-3 py-1 rounded-lg">
+                                                        {item}
+                                                    </div>
                                                 ))}
-                                            </ul>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-4">
+                                            <h4 className="text-[10px] font-black uppercase text-amber-500 tracking-[0.2em]">Botanical Support</h4>
+                                            <div className="flex flex-wrap gap-2">
+                                                {report.recommendations.herbs.map((item, i) => (
+                                                    <div key={i} className="text-[11px] font-bold text-slate-400 bg-amber-500/5 border border-amber-500/10 px-3 py-1 rounded-lg">
+                                                        {item}
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Recommendations Section */}
-                            <div className="glass-card p-8 rounded-3xl border-l-4 border-emerald-500">
-                                <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                                    <ShieldAlert className="text-emerald-500" /> Lifestyle Recommendations
+                            <div className="glass-card p-8 rounded-3xl border-l-[6px] border-emerald-500 overflow-hidden relative">
+                                <div className="absolute top-0 right-0 p-8 opacity-5 text-emerald-500">
+                                    <ShieldAlert size={120} />
+                                </div>
+                                <h3 className="text-xl font-black mb-6 flex items-center gap-3 relative z-10">
+                                    <div className="p-2 rounded-lg bg-emerald-500/10"><CheckCircle className="text-emerald-500" size={20} /></div>
+                                    Lifestyle Prescription
                                 </h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
                                     {report.recommendations.lifestyle.map((item, i) => (
-                                        <div key={i} className="bg-emerald-500/5 p-4 rounded-xl flex items-center gap-3 border border-emerald-500/10">
-                                            <CheckCircle className="text-emerald-500 shrink-0" size={18} />
-                                            <span className="text-sm text-slate-300">{item}</span>
+                                        <div key={i} className="bg-slate-900/50 p-4 rounded-2xl flex items-center gap-4 border border-white/5 hover:border-emerald-500/30 transition-colors">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                                            <span className="text-sm font-medium text-slate-300">{item}</span>
                                         </div>
                                     ))}
                                 </div>
                             </div>
 
                             {/* Disclaimer */}
-                            <div className="text-center text-slate-600 text-[10px] uppercase tracking-tighter mt-12">
-                                This report is generated by an Artificial Intelligence system and is for educational/reference purposes only.
-                                Please consult a certified Cardiologist for medical decisions.
+                            <div className="text-center bg-slate-900/50 p-6 rounded-2xl border border-white/5">
+                                <p className="text-slate-600 text-[9px] font-bold uppercase tracking-[0.3em] leading-relaxed">
+                                    Artificial Intelligence Research Publication • Experimental Diagnostic Framework • Non-Binding Clinical Assessment
+                                </p>
+                                <p className="text-slate-700 text-[8px] font-medium mt-2">
+                                    Model ID: CardioXAI-V2.4 • Analysis Engine: Google Gemini Pro (Medical Subset)
+                                </p>
                             </div>
                         </div>
                     </motion.div>
@@ -524,123 +570,172 @@ const Home: React.FC = () => {
             <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
                 <div
                     id="professional-report-content"
-                    className="bg-white text-slate-900 p-12 w-[210mm] min-h-[297mm] font-sans"
-                    style={{ background: 'white', color: '#0f172a' }}
+                    className="bg-white text-slate-900 w-[210mm] min-h-[297mm] font-serif p-0"
+                    style={{ background: 'white' }}
                 >
-                    {/* Header */}
-                    <div className="flex justify-between items-start border-b-4 border-red-600 pb-6 mb-8">
-                        <div>
-                            <h1 className="text-4xl font-black text-slate-900 mb-1">CARDIO<span className="text-red-600">XAI</span></h1>
-                            <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">Advanced Cardiovascular AI Diagnostics</p>
-                        </div>
-                        <div className="text-right">
-                            <h2 className="text-xl font-bold text-slate-800">DIAGNOSTIC REPORT</h2>
-                            <p className="text-xs text-slate-500 mt-1">Report ID: <span className="font-mono">{report?.id}</span></p>
-                            <p className="text-xs text-slate-500">Date: {report?.date}</p>
-                        </div>
-                    </div>
+                    {/* Top Aesthetic Border */}
+                    <div className="h-4 bg-red-600 w-full" />
 
-                    {/* Patient Information Section */}
-                    <div className="mb-8">
-                        <h3 className="text-lg font-bold bg-slate-100 px-4 py-2 border-l-4 border-slate-900 mb-4 uppercase">Patient Information</h3>
-                        <div className="grid grid-cols-2 gap-y-4 px-4 text-sm">
-                            <div className="flex justify-between border-b border-slate-100 pb-1 mr-8">
-                                <span className="font-bold text-slate-500">Full Name:</span>
-                                <span className="text-slate-900">{report?.patient.name}</span>
-                            </div>
-                            <div className="flex justify-between border-b border-slate-100 pb-1">
-                                <span className="font-bold text-slate-500">Age:</span>
-                                <span className="text-slate-900">{report?.patient.age} Years</span>
-                            </div>
-                            <div className="flex justify-between border-b border-slate-100 pb-1 mr-8">
-                                <span className="font-bold text-slate-500">Gender:</span>
-                                <span className="text-slate-900">{report?.patient.gender}</span>
-                            </div>
-                            <div className="flex justify-between border-b border-slate-100 pb-1">
-                                <span className="font-bold text-slate-500">Resting HR:</span>
-                                <span className="text-slate-900">{report?.patient.restingHR} BPM</span>
-                            </div>
-                            <div className="flex justify-between border-b border-slate-100 pb-1 mr-8">
-                                <span className="font-bold text-slate-500">Blood Pressure:</span>
-                                <span className="text-slate-900">{report?.patient.systolicBP}/{report?.patient.diastolicBP} mmHg</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Clinical Observation Section */}
-                    <div className="mb-8">
-                        <h3 className="text-lg font-bold bg-slate-100 px-4 py-2 border-l-4 border-slate-900 mb-4 uppercase">Clinical Findings</h3>
-                        <div className="grid grid-cols-2 gap-8 px-4 text-sm">
-                            <div className="space-y-3">
-                                <h4 className="font-black text-xs text-red-600 uppercase border-b border-red-100 pb-1">ECG Parameters</h4>
-                                <div className="flex justify-between"><span>ST Depression:</span> <span className="font-bold">{report?.ecg.stDepression} mm</span></div>
-                                <div className="flex justify-between"><span>ST Slope:</span> <span className="font-bold">{report?.ecg.stSlope}</span></div>
-                                <div className="flex justify-between"><span>QRS Duration:</span> <span className="font-bold">{report?.ecg.qrsDuration} ms</span></div>
-                                <div className="flex justify-between"><span>PR Interval:</span> <span className="font-bold">{report?.ecg.prInterval} ms</span></div>
-                            </div>
-                            <div className="space-y-3">
-                                <h4 className="font-black text-xs text-red-600 uppercase border-b border-red-100 pb-1">Stress Test (TMT)</h4>
-                                <div className="flex justify-between"><span>METs Achieved:</span> <span className="font-bold">{report?.tmt.metsAchieved}</span></div>
-                                <div className="flex justify-between"><span>Max Exercise HR:</span> <span className="font-bold">{report?.tmt.maxExerciseHR} BPM</span></div>
-                                <div className="flex justify-between"><span>Duration:</span> <span className="font-bold">{report?.tmt.exerciseDuration} min</span></div>
-                                <div className="flex justify-between"><span>Angina:</span> <span className="font-bold">{report?.tmt.anginaDuringExercise ? 'Observed' : 'Not Observed'}</span></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* AI Diagnosis Result */}
-                    <div className={`mb-8 p-6 rounded-2xl border-2 ${report?.riskScore > 70 ? 'bg-red-50 border-red-200' : report?.riskScore > 40 ? 'bg-amber-50 border-amber-200' : 'bg-emerald-50 border-emerald-200'}`}>
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-xl font-black uppercase">AI Risk Severity</h3>
-                            <span className={`px-4 py-1 rounded-full text-xs font-black text-white ${report?.riskScore > 70 ? 'bg-red-600' : report?.riskScore > 40 ? 'bg-amber-600' : 'bg-emerald-600'}`}>
-                                {report?.riskScore > 70 ? 'CRITICAL RISK' : report?.riskScore > 40 ? 'MODERATE RISK' : 'LOW RISK'}
-                            </span>
-                        </div>
-                        <p className="text-slate-700 font-bold mb-4">{report?.explanation}</p>
-                        <div className="flex flex-wrap gap-2">
-                            {report?.potentialConditions.map((c, i) => (
-                                <span key={i} className="bg-white border border-slate-200 px-3 py-1 rounded-lg text-xs font-bold text-slate-800">
-                                    {c}
-                                </span>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Recommendations Section */}
-                    <div className="grid grid-cols-2 gap-8 mb-12">
-                        <div>
-                            <h4 className="font-black text-xs uppercase text-slate-400 mb-3 tracking-tighter">Clinical Recommendations</h4>
-                            <ul className="space-y-2">
-                                {report?.recommendations.lifestyle.map((item, i) => (
-                                    <li key={i} className="text-xs text-slate-600 flex items-start gap-2">
-                                        <span className="text-red-500">•</span> {item}
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                        <div>
-                            <h4 className="font-black text-xs uppercase text-slate-400 mb-3 tracking-tighter">Natural Supports</h4>
-                            <div className="space-y-3 text-xs">
-                                <div>
-                                    <p className="font-bold text-slate-700">Diet:</p>
-                                    <p className="text-slate-500 leading-tight">{report?.recommendations.diet.join(', ')}</p>
+                    <div className="p-16">
+                        {/* Medical Letterhead */}
+                        <div className="flex justify-between items-start mb-16 border-b-2 border-slate-100 pb-12">
+                            <div className="space-y-1">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="w-12 h-12 bg-red-600 rounded-xl flex items-center justify-center text-white font-black text-2xl">C</div>
+                                    <h1 className="text-3xl font-black text-slate-900 tracking-tighter">CARDIO<span className="text-red-600">XAI</span></h1>
                                 </div>
-                                <div>
-                                    <p className="font-bold text-slate-700">Herbs/Supplements:</p>
-                                    <p className="text-slate-500 leading-tight">{report?.recommendations.herbs.join(', ')}</p>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Advanced Cardiovascular AI Research Lab</p>
+                                <p className="text-[9px] text-slate-400 font-medium">Precision Medicine • Explainable AI • Molecular Cardiology Insights</p>
+                            </div>
+                            <div className="text-right space-y-2">
+                                <h2 className="text-2xl font-black text-slate-800 tracking-tight">DIAGNOSTIC REPORT</h2>
+                                <div className="space-y-1">
+                                    <p className="text-[10px] font-bold text-slate-500">REF ID: <span className="font-mono text-slate-900">{report?.id}</span></p>
+                                    <p className="text-[10px] font-bold text-slate-500 uppercase">DATE: <span className="text-slate-900">{report?.date}</span></p>
+                                    <div className="inline-block mt-4 px-3 py-1 bg-red-50 text-red-600 rounded-lg text-[9px] font-black uppercase border border-red-100">
+                                        Digital Verified Security Report
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Footer / Signature Area */}
-                    <div className="mt-auto border-t border-slate-100 pt-12 flex justify-between items-end">
-                        <div className="text-[10px] text-slate-400 max-w-[60%] leading-tight uppercase font-bold">
-                            Legal Disclaimer: This report is generated by an Artificial Intelligence system for screening assistance. Final medical decisions must be verified by a board-certified physician.
+                        {/* Patient & Summary Section */}
+                        <div className="grid grid-cols-3 gap-12 mb-16">
+                            <div className="col-span-2">
+                                <h3 className="text-[10px] font-black uppercase text-red-600 mb-6 tracking-[0.2em] border-b border-red-100 pb-2">Patient Profile</h3>
+                                <div className="grid grid-cols-2 gap-x-12 gap-y-6">
+                                    <div className="space-y-1 border-l-2 border-slate-100 pl-4">
+                                        <p className="text-[9px] uppercase font-bold text-slate-400">Full Name</p>
+                                        <p className="text-sm font-black text-slate-800">{report?.patient.name}</p>
+                                    </div>
+                                    <div className="space-y-1 border-l-2 border-slate-100 pl-4">
+                                        <p className="text-[9px] uppercase font-bold text-slate-400">Age & Gender</p>
+                                        <p className="text-sm font-black text-slate-800">{report?.patient.age}Y • {report?.patient.gender}</p>
+                                    </div>
+                                    <div className="space-y-1 border-l-2 border-slate-100 pl-4">
+                                        <p className="text-[9px] uppercase font-bold text-slate-400">Resting Metrics</p>
+                                        <p className="text-sm font-black text-slate-800">{report?.patient.restingHR} BPM • {report?.patient.systolicBP}/{report?.patient.diastolicBP} mmHg</p>
+                                    </div>
+                                    <div className="space-y-1 border-l-2 border-slate-100 pl-4">
+                                        <p className="text-[9px] uppercase font-bold text-slate-400">Risk Severity</p>
+                                        <p className={`text-sm font-black ${report?.riskScore > 70 ? 'text-red-600' : report?.riskScore > 40 ? 'text-amber-600' : 'text-emerald-600'}`}>
+                                            {report?.riskScore}% - {report?.riskScore > 70 ? 'CRITICAL RISK' : report?.riskScore > 40 ? 'MODERATE RISK' : 'LOW RISK'}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex flex-col items-center justify-center p-6 bg-slate-50 rounded-[2rem] border border-slate-100">
+                                <div className="text-[9px] font-black uppercase text-slate-400 mb-4 tracking-widest text-center leading-tight">AI Confidence Score</div>
+                                <div className="relative flex items-center justify-center">
+                                    <svg className="w-24 h-24 transform -rotate-90">
+                                        <circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-slate-200" />
+                                        <circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="8" fill="transparent"
+                                            strokeDasharray={251.2}
+                                            strokeDashoffset={251.2 - (251.2 * (report?.riskScore || 0)) / 100}
+                                            className={report?.riskScore > 70 ? 'text-red-500' : 'text-emerald-500'}
+                                        />
+                                    </svg>
+                                    <span className="absolute text-xl font-black text-slate-800">{report?.riskScore}%</span>
+                                </div>
+                            </div>
                         </div>
-                        <div className="text-center w-48 border-t-2 border-slate-300 pt-2">
-                            <p className="text-xs font-black uppercase tracking-widest text-slate-800">Authorizing Signature</p>
-                            <p className="text-[10px] text-slate-400 font-bold mt-1 tracking-tighter uppercase">Board Certified Cardiologist</p>
+
+                        {/* Clinical Parameters Analysis */}
+                        <div className="mb-16">
+                            <h3 className="text-[10px] font-black uppercase text-slate-400 mb-8 tracking-[0.2em] border-b border-slate-100 pb-2">Quantitative Clinical Parameters</h3>
+                            <div className="grid grid-cols-2 gap-16">
+                                <div className="space-y-6">
+                                    <h4 className="text-[11px] font-black text-slate-800 italic underline decoration-red-200 underline-offset-4">Electrocardiography (ECG)</h4>
+                                    <table className="w-full text-[10px]">
+                                        <tbody className="space-y-3">
+                                            <tr className="border-b border-slate-50"><td className="py-2 text-slate-500">ST-Segment Depression</td><td className="py-2 text-right font-black">{report?.ecg.stDepression} mm</td></tr>
+                                            <tr className="border-b border-slate-50"><td className="py-2 text-slate-500">Repolarization Slope</td><td className="py-2 text-right font-black">{report?.ecg.stSlope}</td></tr>
+                                            <tr className="border-b border-slate-50"><td className="py-2 text-slate-500">QRS Complex Duration</td><td className="py-2 text-right font-black">{report?.ecg.qrsDuration} ms</td></tr>
+                                            <tr className="border-b border-slate-50"><td className="py-2 text-slate-500">PR Interval Analysis</td><td className="py-2 text-right font-black">{report?.ecg.prInterval} ms</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div className="space-y-6">
+                                    <h4 className="text-[11px] font-black text-slate-800 italic underline decoration-indigo-200 underline-offset-4">Physical Stress Dynamics (TMT)</h4>
+                                    <table className="w-full text-[10px]">
+                                        <tbody className="space-y-3">
+                                            <tr className="border-b border-slate-50"><td className="py-2 text-slate-500">Metabolic Equivalents (METs)</td><td className="py-2 text-right font-black">{report?.tmt.metsAchieved} METs</td></tr>
+                                            <tr className="border-b border-slate-50"><td className="py-2 text-slate-500">Max Chronotropic Response</td><td className="py-2 text-right font-black">{report?.tmt.maxExerciseHR} BPM</td></tr>
+                                            <tr className="border-b border-slate-50"><td className="py-2 text-slate-500">Exercise Tolerance Secs</td><td className="py-2 text-right font-black">{report?.tmt.exerciseDuration} min</td></tr>
+                                            <tr className="border-b border-slate-50"><td className="py-2 text-slate-500">Cardiovascular Angina</td><td className="py-2 text-right font-black">{report?.tmt.anginaDuringExercise ? 'Observed' : 'Absent'}</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Professional Findings */}
+                        <div className="mb-16 bg-slate-900 text-white p-12 rounded-[2.5rem] relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-red-600/20 blur-3xl rounded-full" />
+                            <h3 className="text-[10px] font-black uppercase text-red-500 mb-6 tracking-[0.2em]">Artificial Intelligence Synthesis</h3>
+                            <div className="space-y-6">
+                                <p className="text-base font-serif leading-relaxed text-slate-100 italic">
+                                    "{report?.explanation}"
+                                </p>
+                                <div className="pt-6 border-t border-white/10 flex flex-wrap gap-3">
+                                    {report?.potentialConditions.map((c, i) => (
+                                        <span key={i} className="px-3 py-1 bg-white/5 border border-white/10 rounded text-[9px] font-black uppercase tracking-wider text-slate-300">
+                                            {c}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Prescription Grid */}
+                        <div className="grid grid-cols-2 gap-12 mb-20">
+                            <div className="space-y-6">
+                                <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] border-b border-slate-100 pb-2">Clinical Recommendations</h4>
+                                <ul className="space-y-4">
+                                    {report?.recommendations.lifestyle.map((item, i) => (
+                                        <li key={i} className="text-[11px] text-slate-600 flex items-start gap-4">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-red-600 mt-1.5 shrink-0" />
+                                            <span className="font-medium leading-relaxed">{item}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                            <div className="space-y-6">
+                                <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] border-b border-slate-100 pb-2">Therapeutic Support</h4>
+                                <div className="space-y-8">
+                                    <div className="bg-emerald-50/50 p-6 rounded-2xl border border-emerald-100">
+                                        <p className="text-[9px] font-black text-emerald-600 uppercase mb-3 underline underline-offset-2">Dietary Strategy</p>
+                                        <p className="text-[10px] text-slate-700 font-bold leading-relaxed italic">{report?.recommendations.diet.join(', ')}</p>
+                                    </div>
+                                    <div className="bg-amber-50/50 p-6 rounded-2xl border border-amber-100">
+                                        <p className="text-[9px] font-black text-amber-600 uppercase mb-3 underline underline-offset-2">Botanical/Pharma Support</p>
+                                        <p className="text-[10px] text-slate-700 font-bold leading-relaxed italic">{report?.recommendations.herbs.join(', ')}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Signature Area */}
+                        <div className="mt-auto pt-16 border-t-2 border-slate-100 flex justify-between items-end">
+                            <div className="space-y-4 max-w-[60%]">
+                                <div className="text-[9px] font-black text-slate-800 uppercase flex items-center gap-2">
+                                    <div className="w-2 h-2 rounded-full bg-red-600" />
+                                    Digital Verification Stamp Card
+                                </div>
+                                <p className="text-[8px] text-slate-400 leading-tight uppercase font-bold pr-12">
+                                    This document is generated for research and educational assistance. Clinical decisions should be ratified by a human cardiologist after physical examination.
+                                    The model utilized (CardioXAI-V2) has been trained on valid medical archives.
+                                </p>
+                            </div>
+                            <div className="text-center w-64">
+                                <div className="h-16 flex items-center justify-center mb-2 px-4 italic font-serif text-slate-400 text-sm opacity-50 select-none">
+                                    Digitally Signed by CardioXAI Neural Engine
+                                </div>
+                                <div className="border-t border-slate-300 pt-3">
+                                    <p className="text-[11px] font-black text-slate-900 uppercase tracking-tighter">AI Lab Director Signature</p>
+                                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-[0.1em] mt-1">Research Publication Series</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -650,3 +745,4 @@ const Home: React.FC = () => {
 };
 
 export default Home;
+
