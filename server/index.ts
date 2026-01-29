@@ -190,7 +190,7 @@ const distPath = path.resolve(__dirname, '../dist');
 app.use(express.static(distPath));
 
 // Handle SPA routing - serve index.html for any unknown routes
-app.get('*', (req, res) => {
+app.get('*path', (req, res) => {
     res.sendFile(path.join(distPath, 'index.html'));
 });
 
