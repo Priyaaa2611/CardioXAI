@@ -35,7 +35,8 @@ const CsvPage: React.FC = () => {
         formData.append('file', file);
 
         try {
-            const response = await fetch('http://localhost:3001/upload', {
+            const API_URL = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3001';
+            const response = await fetch(`${API_URL}/upload`, {
                 method: 'POST',
                 body: formData,
             });
