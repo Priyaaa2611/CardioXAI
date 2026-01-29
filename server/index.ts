@@ -12,8 +12,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const envPath = path.resolve(__dirname, '../.env.local');
-console.log('Loading env from:', envPath);
-dotenv.config({ path: envPath });
+if (process.env.NODE_ENV !== 'production') {
+    console.log('Loading env from:', envPath);
+    dotenv.config({ path: envPath });
+} else {
+    dotenv.config(); // Load variables from environment
+}
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -181,7 +185,15 @@ app.delete('/records', async (req, res) => {
     }
 });
 
+// Serve static files from the 'dist' directory
+const distPath = path.resolve(__dirname, '../dist');
+app.use(express.static(distPath));
+
+// Handle SPA routing - serve index.html for any unknown routes
+app.get('*', (req, res) => {
+    res.sendFile(path.join(distPath, 'index.html'));
+});
+
 app.listen(port, () => {
     console.log(`Backend server running at http://localhost:${port}`);
 });
-
